@@ -24,7 +24,7 @@ if st.button("Generate"):
     try:
       with st.spinner("Please wait..."):
         if option == "Text: Meta Llama 2 70B":
-          # Run llama-2-70b-4096 model on Groq
+          # Run llama2-70b-4096 model on Groq
           chat_completion = client.chat.completions.create(
               messages=[
                   {
@@ -32,7 +32,7 @@ if st.button("Generate"):
                       "content": prompt,
                   }
               ],
-              model="llama-2-70b-4096",
+              model="llama2-70b-4096",
           )
           st.success(chat_completion.choices[0].message.content)
         elif option == "Text: Google Gemma 7B Instruct":
