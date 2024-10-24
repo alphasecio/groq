@@ -6,8 +6,8 @@ st.subheader("Groq Playground")
 with st.sidebar:
   groq_api_key = st.text_input("Groq API Key", type="password")
   option = st.selectbox("Select Model", [
-    "Text: Meta Llama 3 70B",
-    "Text: Google Gemma 7B Instruct",
+    "Text: Meta Llama 3.1 70B",
+    "Text: Google Gemma 2 9B Instruct",
     "Text: Mixtral 8x7B Instruct"]
     )
 
@@ -23,8 +23,8 @@ if st.button("Generate"):
   else:
     try:
       with st.spinner("Please wait..."):
-        if option == "Text: Meta Llama 3 70B":
-          # Run llama3-70b-8192 model on Groq
+        if option == "Text: Meta Llama 3.1 70B":
+          # Run llama-3.1-70b-versatile model on Groq
           chat_completion = client.chat.completions.create(
               messages=[
                   {
@@ -32,11 +32,11 @@ if st.button("Generate"):
                       "content": prompt,
                   }
               ],
-              model="llama3-70b-8192",
+              model="llama-3.1-70b-versatile",
           )
           st.success(chat_completion.choices[0].message.content)
-        elif option == "Text: Google Gemma 7B Instruct":
-          # Run gemma-7b-it model on Groq
+        elif option == "Text: Google Gemma 2 9B Instruct":
+          # Run gemma2-9b-it model on Groq
           chat_completion = client.chat.completions.create(
               messages=[
                   {
@@ -44,7 +44,7 @@ if st.button("Generate"):
                       "content": prompt,
                   }
               ],
-              model="gemma-7b-it",
+              model="gemma2-9b-it",
           )
           st.success(chat_completion.choices[0].message.content)
         elif option == "Text: Mixtral 8x7B Instruct":
