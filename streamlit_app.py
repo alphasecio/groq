@@ -6,9 +6,10 @@ st.subheader("Groq Playground")
 with st.sidebar:
   groq_api_key = st.text_input("Groq API Key", type="password")
   option = st.selectbox("Select Model", [
-    "Text: Meta Llama 3.1 70B",
+    "Text: Meta Llama 3.3 70B",
     "Text: Google Gemma 2 9B Instruct",
-    "Text: Mixtral 8x7B Instruct"]
+    "Text: Mixtral 8x7B Instruct",
+    "Text: DeepSeek R1 (Preview)"]
     )
 
 prompt = st.text_input("Prompt", label_visibility="collapsed")
@@ -23,8 +24,8 @@ if st.button("Generate"):
   else:
     try:
       with st.spinner("Please wait..."):
-        if option == "Text: Meta Llama 3.1 70B":
-          # Run llama-3.1-70b-versatile model on Groq
+        if option == "Text: Meta Llama 3.3 70B":
+          # Run llama-3.3-70b-versatile model on Groq
           chat_completion = client.chat.completions.create(
               messages=[
                   {
@@ -32,7 +33,7 @@ if st.button("Generate"):
                       "content": prompt,
                   }
               ],
-              model="llama-3.1-70b-versatile",
+              model="llama-3.3-70b-versatile",
           )
           st.success(chat_completion.choices[0].message.content)
         elif option == "Text: Google Gemma 2 9B Instruct":
@@ -57,6 +58,18 @@ if st.button("Generate"):
                   }
               ],
               model="mixtral-8x7b-32768",
+          )
+          st.success(chat_completion.choices[0].message.content)
+        elif option == "Text: DeepSeek R1 (Preview)":
+          # Run deepseek-r1-distill-llama-70b model on Groq
+          chat_completion = client.chat.completions.create(
+              messages=[
+                  {
+                      "role": "user",
+                      "content": prompt,
+                  }
+              ],
+              model="deepseek-r1-distill-llama-70b",
           )
           st.success(chat_completion.choices[0].message.content)
     except Exception as e:
