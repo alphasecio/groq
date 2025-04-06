@@ -3,8 +3,10 @@
 
 This repository showcases a simple Streamlit app for running the following open-source text models on Groq:
 * Text: Meta Llama 3.3 70B
+* Text: Meta Llama 4 Scout 17B
 * Text: Google Gemma 2 9B Instruct
-* Text: Mixtral 8x7B Instruct
+* Text: Mistral Saba 24B
+* Text: Alibaba Qwen 2.5 32B (*requires terms acceptance on Groq console*)
 * Text: DeepSeek R1 (Preview)
 
 ![groq-playground](./groq-playground.png)
