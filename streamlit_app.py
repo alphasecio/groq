@@ -6,8 +6,10 @@ st.set_page_config(page_title="Groq Playground", initial_sidebar_state="auto")
 
 model_options = {
     "Text: Meta Llama 3.3 70B": "llama-3.3-70b-versatile",
+    "Text: Meta Llama 4 Scout 17B": "meta-llama/llama-4-scout-17b-16e-instruct",
     "Text: Google Gemma 2 9B Instruct": "gemma2-9b-it",
-    "Text: Mixtral 8x7B Instruct": "mixtral-8x7b-32768",
+    "Text: Mistral Saba 24B": "mistral-saba-24b",
+    "Text: Alibaba Qwen 2.5 32B": "qwen-2.5-32b",
     "Text: DeepSeek R1 (Preview)": "deepseek-r1-distill-llama-70b"
 }
 
