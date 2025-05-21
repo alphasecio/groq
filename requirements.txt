@@ -1,2 +1,3 @@
-streamlit==1.45.0
-groq==0.24.0
+streamlit==1.45.1
+groq==0.25.0
+mem0ai==0.1.101
