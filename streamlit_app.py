@@ -31,8 +31,13 @@ model_options = {
 with st.sidebar:
   st.title("Groq Chatbot")
   with st.expander("**⚙️ Settings**", expanded=True):
-    st.session_state.groq_api_key = st.text_input("Groq API key", type="password")
-    st.session_state.openai_api_key = st.text_input("OpenAI API key", type="password")
+    groq_api_key = st.text_input("Groq API key", type="password", value=st.session_state.groq_api_key)
+    if groq_api_key:
+      st.session_state.groq_api_key = groq_api_key.strip()
+    
+    openai_api_key = st.text_input("OpenAI API key", type="password", value=st.session_state.openai_api_key)
+    if openai_api_key:
+      st.session_state.openai_api_key = openai_api_key.strip()
     
     model_option = st.selectbox("Chat model", list(model_options.keys()))
     st.session_state.model = model_options[model_option]
@@ -58,9 +63,16 @@ if st.session_state.groq_api_key and st.session_state.openai_api_key:
           "llm": {
               "provider": "groq",
               "config": {
-                  "model": st.session_state.model,
+                  "model": "mixtral-8x7b-32768",
                   "temperature": 0.1,
                   "max_tokens": 2000,
+              }
+          },
+          "embedder": {
+              "provider": "openai",
+              "config": {
+                  "model": "text-embedding-3-small",
+                  "api_key": st.session_state.openai_api_key,
               }
           }
       }
@@ -69,51 +81,41 @@ if st.session_state.groq_api_key and st.session_state.openai_api_key:
       st.error(f"Error initializing Mem0 client: {e}")
 
 def chat_with_memory(message: str, user_id: str = "default_user") -> str:
-    # Retrieve relevant memories
     try:
+      # Retrieve relevant memories
       memories = st.session_state.memory.search(query=message, user_id=user_id, limit=5)
       memories_str = "\n".join(f"- {entry['memory']}" for entry in memories["results"])
-    except Exception as e:
-        st.error(f"Error searching memories: {e}")
-        memories_str = "No memories retrieved due to an error."
 
-    # Generate Assistant response
-    system_prompt = f"You are a helpful AI. Answer the question based on user query and memories.\nUser Memories:\n{memories_str}"
-    messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": message}]
-    try:
+      # Generate Assistant response
+      system_prompt = f"You are a helpful AI. Answer the question based on user query and memories.\nUser Memories:\n{memories_str}"
+      messages = [{"role": "system", "content": system_prompt}, {"role": "user", "content": message}]
       response = st.session_state.client.chat.completions.create(model=st.session_state.model, messages=messages)
       assistant_response = response.choices[0].message.content
-    except Exception as e:
-        st.error(f"Error generating LLM response: {e}")
-
-    # Create new memories from the conversation
-    try:
+      
+      # Create new memories from the conversation
       messages.append({"role": "assistant", "content": assistant_response})
       st.session_state.memory.add(messages, user_id=user_id)
     except Exception as e:
-        st.error(f"Error adding memories: {e}")
-
+        st.error(f"Error: {e}")
     return assistant_response
 
 # User-Assistant chat interaction
-if prompt := st.chat_input("Ask anything"):
-  if not st.session_state.groq_api_key:
-    st.error("Please provide Groq API key.")
-    st.stop()
-  elif not st.session_state.openai_api_key:
-    st.error("Please provide OpenAI API key.")
-    st.stop()
-  else:
-    try:
-      # User prompt
-      with st.chat_message("user"):
-        st.markdown(prompt)
-        st.session_state.messages.append({"role": "user", "content": prompt})
+keys_ready = bool(st.session_state.groq_api_key and st.session_state.openai_api_key)
+prompt = st.chat_input("Ask anything", disabled=not keys_ready)
 
-      # Assistant response
-      with st.chat_message("assistant"):
-        response = chat_with_memory(prompt)
-        st.write(response)
-        st.session_state.messages.append({"role": "assistant", "content": response})
-    except Exception as e:
-      st.exception(f"Error during chat interaction: {e}")
+if prompt:
+  try:
+    # User prompt
+    with st.chat_message("user"):
+      st.markdown(prompt)
+      st.session_state.messages.append({"role": "user", "content": prompt})
+
+    # Assistant response
+    with st.chat_message("assistant"):
+      response = chat_with_memory(prompt)
+      st.markdown(response)
+      st.session_state.messages.append({"role": "assistant", "content": response})
+  except Exception as e:
+    st.exception(f"Error during chat interaction: {e}")
+elif not keys_ready:
+  st.warning("Please provide API keys to start chatting...")
